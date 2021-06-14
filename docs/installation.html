@@ -1,0 +1,311 @@
+1- Créer un serveur Express simple
+
+Créer un dossier backend
+Cloner le repo github du projet dans le dossier frontend
+Se rendre dans le dossier frontend (cd frontend)
+npm install
+npm install node-sass
+ng serve (Le frontend est accessible sur localhost:4200)
+
+Ouvrir un nouveau terminal
+Créer un dossier backend
+npm init (Initialisation du projet)
+Créer server.js à la racine de backend
+Remplacer index.js par server.js dans package.json, ligne 5
+
+Saisir le code du server dans server.js
+<!--
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+    res.end('Voilà la réponse du serveur !');
+});
+
+server.listen(process.env.PORT || 3000);
+-->
+
+npm install -g nodemon
+nodemon -serve (Le serveur tourne sur localhost:3000)
+npm install --save express
+
+Créer app.js pour y placer l'application express (Framework simplifiant le développement des API Node)
+<!-- 
+const express = require('express');
+
+const app = express();
+
+app.use((req, res) => {
+    res.json({ message: 'Votre requête a bien été reçue !' });
+});
+
+module.exports = app; 
+-->
+
+Modifier server.js
+<!-- 
+const http = require('http');
+const app = require('./app');
+
+app.set('port', process.env.PORT || 3000);
+const server = http.createServer(app);
+
+server.listen(process.env.PORT || 3000);
+-->
+
+Améliorer server.js
+<!--
+const http = require('http');
+const app = require('./app');
+
+const normalizePort = val => {
+  const port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    return val;
+  }
+  if (port >= 0) {
+    return port;
+  }
+  return false;
+};
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+const errorHandler = error => {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+  const address = server.address();
+  const bind = typeof address === 'string' ? 'pipe ' + address : 'port: ' + port;
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges.');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use.');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+};
+
+const server = http.createServer(app);
+
+server.on('error', errorHandler);
+server.on('listening', () => {
+  const address = server.address();
+  const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
+  console.log('Listening on ' + bind);
+});
+
+server.listen(port);
+-->
+
+Créer une route get dans app.js 
+<!--    
+app.use('/api/stuff', (req, res, next) => {
+  const stuff = [
+    {
+      _id: 'oeihfzeoi',
+      title: 'Mon premier objet',
+      description: 'Les infos de mon premier objet',
+      imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
+      price: 4900,
+      userId: 'qsomihvqios',
+    },
+    {
+      _id: 'oeihfzeomoihi',
+      title: 'Mon deuxième objet',
+      description: 'Les infos de mon deuxième objet',
+      imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
+      price: 2900,
+      userId: 'qsomihvqios',
+    },
+  ];
+  res.status(200).json(stuff);
+});
+-->
+
+Gérer les erreurs de CORS dans app.js (avant les routes)
+
+<!--    
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    next();
+});
+-->
+
+Installer body parser pour pouvoir extraire les objets json
+npm install --save body-parser
+Importer body parser dans app.js 
+<!-- const bodyParser = require('body-parser'); -->
+Définir la fonction json de body parser comme middleware global
+<!-- app.use(bodyParser.json());-->
+Dans app.js, mettre le middleware post avant le GET
+<!--
+app.post('/api/stuff', (req, res, next) => {
+  console.log(req.body);
+  res.status(201).json({
+    message: 'Objet créé !'
+  });
+});
+-->
+
+2 - Créer une API Restful
+
+Configurer MongoDB Atlas 
+https://www.mongodb.com/cloud/atlas
+Créer un cluster gratuit M0
+Database access pour crér un utilisateur avec Read and Write
+Network access pour autoriser toutes les ips
+
+Appuyer sur connect dans le cluster, connect your application, connection string only
+Copier la chaine de caractères
+Installer mongoose pour connecter l'API à MongoDB
+npm install --save mongoose
+Importer mongoose dans app.js 
+<!-- 
+const mongoose = require('mongoose');
+-->
+Dans app.js, apres la declaration de contante app, en remplacant username, password et url par les données de connection MongoDB 
+<!--
+mongoose.connect('mongodb+srv://jimbob:<PASSWORD>@cluster0-pme76.mongodb.net/test?retryWrites=true&w=majority',
+  { useNewUrlParser: true,
+    useUnifiedTopology: true })
+  .then(() => console.log('Connexion à MongoDB réussie !'))
+  .catch(() => console.log('Connexion à MongoDB échouée !'));
+-->
+
+Package de validation pour pré valider les saisies avant l'insertion MongoDB 
+npm install --save mongoose-unique-validator
+On peut créer un répertoire models
+Dans ce répertoire, on crée un user.js 
+<!-- 
+const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+
+const userSchema = mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+});
+
+userSchema.plugin(uniqueValidator);
+
+module.exports = mongoose.model('User', userSchema);
+-->
+On crée un dossier controllers 
+On y place un fichier user.js 
+<!-- 
+exports.signup = (req, res, next) => {
+
+};
+
+exports.login = (req, res, next) => {
+
+};
+-->
+On crée un dossier routes 
+On y place un fichier user.js
+<!-- 
+const express = require('express');
+const router = express.Router();
+
+const userCtrl = require('../controllers/user');
+
+router.post('/signup', userCtrl.signup);
+router.post('/login', userCtrl.login);
+
+module.exports = router;
+-->
+On enregistre le routeur dans app.js 
+<!-- 
+const userRoutes = require('./routes/user');
+-->
+On enregistre la route avec l'url désirée dans app.js 
+<!-- 
+app.use('/api/auth', userRoutes);
+-->
+
+On installe bcrypt pour pouvoir chiffrer le mdp lors de l'inscription
+npm install --save bcrypt
+On importe bcrypt dans controllers/user.js
+<!-- 
+const bcrypt = require('bcrypt');
+-->
+On rempli la fonction signup dans controllers/user.js 
+<!-- 
+exports.signup = (req, res, next) => {
+    bcrypt.hash(req.body.password, 10) // On sale 10 fois
+        .then(hash => {
+            const user = new User({
+                email: req.body.email,
+                password: hash
+            });
+            user.save()
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+                .catch(error => res.status(400).json({ error }));
+        })
+        .catch(error => res.status(500).json({ error }));
+};
+-->
+On installe jsonwebtoken pour gérer les tokens d'identification
+npm install --save jsonwebtoken
+On importe jsonwebtoken dans controllers/user.js
+On rempli la fonction login dans controllers/user.js
+<!--  
+exports.login = (req, res, next) => {
+  User.findOne({ email: req.body.email })
+    .then(user => {
+      if (!user) {
+        return res.status(401).json({ error: 'Utilisateur non trouvé !' });
+      }
+      bcrypt.compare(req.body.password, user.password)
+        .then(valid => {
+          if (!valid) {
+            return res.status(401).json({ error: 'Mot de passe incorrect !' });
+          }
+          res.status(200).json({
+            userId: user._id,
+            token: jwt.sign(
+              { userId: user._id },
+              'RANDOM_TOKEN_SECRET',
+              { expiresIn: '24h' }
+            )
+          });
+        })
+        .catch(error => res.status(500).json({ error }));
+    })
+    .catch(error => res.status(500).json({ error }));
+};
+-->
+
+Faire un middleware d'authentification
+Créer un dossier middleware
+Y insérer un fichier auth.js 
+<!-- 
+const jwt = require('jsonwebtoken');
+
+module.exports = (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    const userId = decodedToken.userId;
+    if (req.body.userId && req.body.userId !== userId) {
+      throw 'Invalid user ID';
+    } else {
+      next();
+    }
+  } catch {
+    res.status(401).json({
+      error: new Error('Invalid request!')
+    });
+  }
+};
+-->
+Nous l'utiliserons pour protéger les routes accessibles uniquement aux utilisateurs identifiés
+
+Autoriser l'upload d'images
