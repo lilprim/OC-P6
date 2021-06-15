@@ -347,3 +347,9 @@ Ajouter le gestionnaire de routage dans app.js au dessus des routes
 <!--  
 app.use('/images', express.static(path.join(__dirname, 'images')));
 -->
+
+Pour gérer les fichiers (effacer une image par exemple), il faut le package fs 
+Dans le controler sauces.js, on importe le package fs 
+<!--  
+const fs = require('fs');
+-->

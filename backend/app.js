@@ -1,12 +1,17 @@
-const express = require('express'); // Framework Express : création et gestion du serveur
-const bodyParser = require('body-parser'); // Extrait l'objet JSON des requêtes en objet JS
-const mongoose = require('mongoose'); // Connexion à la base de données
-const path = require('path'); // Permet que le navigateur puisse trouver le chemin des dossiers et des fichiers
+/* Imports */
 
-const userRoutes = require('./routes/user');
-const sauceRoutes = require('./routes/sauces');
+const express     = require('express'); // Framework Express: création et gestion du serveur
+const bodyParser  = require('body-parser'); // Extrait l'objet JSON des requêtes en objet JS
+const mongoose    = require('mongoose'); // Connexion à la base de données
+const path        = require('path'); // Permet que le navigateur puisse trouver le chemin des dossiers et des fichiers
+const helmet      = require('helmet'); // Protection des requêtes HTTP - Headers
 
-const app = express();
+const userRoutes  = require('./routes/user'); // Import des routes user
+const sauceRoutes = require('./routes/sauces'); // Import des routes sauces
+
+const app         = express();
+
+/* Connection à MongoDB */
 
 mongoose.connect('mongodb+srv://john:pitton@p6.zbpel.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
     {
@@ -16,6 +21,10 @@ mongoose.connect('mongodb+srv://john:pitton@p6.zbpel.mongodb.net/myFirstDatabase
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
+app.use(helmet());
+
+/* Gestion du CORS */
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -23,11 +32,12 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(bodyParser.json());
 
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use(bodyParser.json()); // Extraction des données JSON
 
-app.use('/api/auth', userRoutes);
-app.use('/api/sauces', sauceRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images'))); // Gestionnaire de routage
+
+app.use('/api/auth', userRoutes); // Routes user
+app.use('/api/sauces', sauceRoutes); // Routes sauces
 
 module.exports = app;

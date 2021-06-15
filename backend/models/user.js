@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
+const mongoose        = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator'); // Permet de gérer les champs uniques et éviter les doublons
 
 const userSchema = mongoose.Schema({
     email: { type: String, required: true, unique: true },
