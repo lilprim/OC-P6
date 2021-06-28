@@ -37,7 +37,7 @@ app.use(bodyParser.json()); // Extraction des données JSON
 
 app.use('/images', express.static(path.join(__dirname, 'images'))); // Gestionnaire de routage
 
-app.use('/api/auth', userRoutes); // Routes user
-app.use('/api/sauces', sauceRoutes); // Routes sauces
+app.use('/api/auth', userRoutes); // Utilisation des routes user
+app.use('/api/sauces', sauceRoutes); // Utilisation des routes sauces
 
 module.exports = app;
