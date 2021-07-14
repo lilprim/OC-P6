@@ -11,3 +11,17 @@
     Token d'authentification stocké dans un cookie coté client avec express-session
     Protection des headers avec helmet
     Log de chaque requête effectuée dans un fichier "assess.log" avec morgan
+
+Cloner
+
+Aller dans le dossier frontend
+
+npm install
+npm install node-sass
+npm install-g @angular/cli
+
+Backend
+
+npm install express (si necessaire)
+npm install nodemon
+nodemon serve
