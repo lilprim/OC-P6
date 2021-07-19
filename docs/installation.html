@@ -139,6 +139,12 @@ app.use((req, res, next) => {
 });
 -->
 
+Installer helmet pour sécuriser les entetes http
+npm install --save helmet 
+dans app.js: 
+const helmet = require("helmet");
+app.use(helmet());
+
 Installer body parser pour pouvoir extraire les objets json
 npm install --save body-parser
 Importer body parser dans app.js 
