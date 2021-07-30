@@ -7,6 +7,7 @@ const User   = require('../models/user'); // Import du model User
 // Inscription de l'utilisateur
 
 exports.signup = (req, res, next) => {
+    console.log(req.body)
     bcrypt.hash(req.body.password, 10) // On sale 10 fois
         .then(hash => {
             const user = new User({
